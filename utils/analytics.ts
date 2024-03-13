@@ -1,5 +1,6 @@
 import { redis } from "@/lib/redis";
 import { getDate } from "@/utils/index";
+import { parse } from "date-fns";
 type AnalyticsArgs = {
   retention?: number;
 };
@@ -25,6 +26,30 @@ export class Analytics {
     //db call to persist this event\
     await redis.hincrby(key, JSON.stringify(event), 1);
     if (!opts?.persist) await redis.expire(key, this.retention);
+  }
+
+  async retrieveDays(namespace: string, nDays: number) {
+    type AnalyticsPromise = ReturnType<typeof analytics.retrieve>;
+    const promises: AnalyticsPromise[] = [];
+
+    for (let i = 0; i < nDays; i++) {
+      const formattedDate = getDate(i);
+      const promise = analytics.retrieve(namespace, formattedDate);
+      promises.push(promise);
+    }
+    const fetched = await Promise.all(promises);
+
+    const data = fetched.sort((a, b) => {
+      if (
+        parse(a.date, "MM/dd/yyyy", new Date()) >
+        parse(b.date, "MM/dd/yyyy", new Date())
+      ) {
+        return 1;
+      } else {
+        return -1;
+      }
+    });
+    return data;
   }
 
   async retrieve(namespace: string, date: string) {
