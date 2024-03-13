@@ -1,8 +1,7 @@
-const Page = () => {
-  return (
-    <div className="text-white">
-      <h1>Hello Page</h1>
-    </div>
-  );
+import { analytics } from "@/utils/analytics";
+
+const Page = async () => {
+  const pageview = await analytics.retrieve("pageview", "03/13/2024");
+  return <pre className="text-white">{JSON.stringify(pageview)}</pre>;
 };
 export default Page;
