@@ -5,7 +5,7 @@ import { analytics } from "@/utils/analytics";
 const Page = async () => {
   const TRACKING_DAYS = 7;
 
-  const pageviews = await analytics.retrieveDays("pageview", 7);
+  const pageviews = await analytics.retrieveDays("pageview", TRACKING_DAYS);
 
   const totalPageviews = pageviews.reduce((acc, curr) => {
     return (
@@ -31,6 +31,7 @@ const Page = async () => {
         <AnalyticsDashboard
           avgVisitorsPerDay={avgVisitorsPerDay}
           amtVisitorsToday={amtVisitorsToday}
+          timeSeriesPageViews={pageviews}
         />
       </div>
     </div>

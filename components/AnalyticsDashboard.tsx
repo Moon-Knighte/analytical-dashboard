@@ -1,14 +1,17 @@
 "use client";
-import { Card } from "@tremor/react";
+import { analytics } from "@/utils/analytics";
+import { BarChart, Card } from "@tremor/react";
 
 type AnalyticsDashboardProps = {
   avgVisitorsPerDay: string;
   amtVisitorsToday: number;
+  timeSeriesPageViews: Awaited<ReturnType<typeof analytics.retrieveDays>>;
 };
 
 const AnalyticsDashboard = ({
   avgVisitorsPerDay,
   amtVisitorsToday,
+  timeSeriesPageViews,
 }: AnalyticsDashboardProps) => {
   return (
     <div className="flex flex-col gap-6">
@@ -36,6 +39,23 @@ const AnalyticsDashboard = ({
           </p>
         </Card>
       </div>
+
+      <Card>
+        {timeSeriesPageViews ? (
+          <BarChart
+            allowDecimals={false}
+            showAnimation
+            data={timeSeriesPageViews.map((day) => ({
+              name: day.date,
+              Visitors: day.events.reduce((acc, curr) => {
+                return acc + Object.values(curr)[0]!;
+              }, 0),
+            }))}
+            categories={["Visitors"]}
+            index="name"
+          />
+        ) : null}
+      </Card>
     </div>
   );
 };
